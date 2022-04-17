@@ -13,7 +13,7 @@
     "sourceMap": true,
     "noImplicitAny": false,
     "strictNullChecks": false,
-    "baseUrl": ".",
+    "baseUrl": "http://82.157.238.76:8888",
     "types": [
       "webpack-env"
     ],
