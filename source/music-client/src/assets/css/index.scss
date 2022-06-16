@@ -1,13 +1,48 @@
-@import "var.scss";
+@import "./var.scss";
+@import "./global.scss";
 
-html, body, div, span,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-dl, dt, dd, ol, ul, li,hr,img,a,
-form, label, tr, th, td,
-article, aside, canvas, details, embed,
-figure, figcaption, footer, header {
+html,
+body,
+div,
+span,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+hr,
+img,
+a,
+form,
+label,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header {
   padding: 0;
   margin: 0;
+}
+
+html, body, #app {
+  height: 100%;
 }
 
 ul,
@@ -16,34 +51,18 @@ li {
   display: inline-block;
 }
 
-html {
-  width: 100%;
-  font-size: 14px;
-  background-color: $theme-background-color;
+.pagination {
+  @include layout(center);
+  transform: translateY(15px);
 }
 
-div {
-  box-sizing: content-box;
+@media screen and (min-width: $sm) {
+  .play-list-container {
+    margin: 0 8% 30px 8%;
+  }
 }
 
-/*表单*/
+/*el*/
 .el-select-dropdown__item {
   display: block !important;
-}
-
-/*轮播图*/
-.el-scrollbar__view,
-.el-select-dropdown__list {
-  width: 100% !important;
-  text-align: center;
-}
-
-.el-carousel__indicators,
-.el-carousel__indicators--outside {
-  display: inline-block;
-  margin-left: 500px !important;
-}
-
-.el-slider__runway {
-  background-color: $color-blue !important;
 }

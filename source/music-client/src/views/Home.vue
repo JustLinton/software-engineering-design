@@ -6,27 +6,38 @@
     </el-carousel-item>
   </el-carousel>
   <!--热门歌单-->
-  <play-list class="section" title="歌单" path="song-sheet-detail" :playList="songList"></play-list>
+  <play-list class="play-list-container" title="热门歌单" path="song-sheet-detail" :playList="songList"></play-list>
   <!--热门歌手-->
-  <play-list class="section" title="歌手" path="singer-detail" :playList="singerList"></play-list>
+  <play-list class="play-list-container" title="热门歌手" path="singer-detail" :playList="singerList"></play-list>
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import PlayList from "@/components/PlayList.vue";
-import { swiperList } from "@/enums";
+import { swiperList, NavName } from "@/enums";
 import { HttpManager } from "@/api";
+import mixin from "@/mixins/mixin";
 
+interface songListRes {
+  code: number;
+  data: Array<object>;
+  success: boolean;
+  type: string;
+}
 const songList = ref([]); // 歌单列表
 const singerList = ref([]); // 歌手列表
-
+const { changeIndex } = mixin();
 try {
   HttpManager.getSongList().then((res) => {
-    songList.value = (res as any[]).sort().slice(0, 10);
+    songList.value = (res.data as Array<object>).sort().slice(0, 15);
   });
 
   HttpManager.getAllSinger().then((res) => {
-    singerList.value = (res as any[]).sort().slice(0, 10);
+    singerList.value = (res.data as Array<object>).sort().slice(0, 15);
+  });
+
+  onMounted(() => {
+    changeIndex(NavName.Home);
   });
 } catch (error) {
   console.error(error);
@@ -36,20 +47,22 @@ try {
 <style lang="scss" scoped>
 @import "@/assets/css/var.scss";
 
+/*轮播图*/
 .swiper-container {
-  width: 90%;
+  width: 80%;
   margin: auto;
-  padding-top: 100px;
+  padding-top: 20px;
   img {
     width: 100%;
   }
 }
 
-.section {
-  width: 100%;
-  margin-top: 20px;
-  padding: $content-padding;
-  background-color: $color-white;
-  box-sizing: border-box;
+.swiper-container:deep(.el-carousel__indicators.el-carousel__indicators--outside) {
+  display: inline-block;
+  transform: translateX(30vw);
+}
+
+.el-slider__runway {
+  background-color: $color-blue;
 }
 </style>

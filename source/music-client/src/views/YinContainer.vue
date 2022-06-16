@@ -1,11 +1,19 @@
 <template>
-  <yin-header></yin-header>
-  <router-view />
-  <yin-current-play></yin-current-play>
-  <yin-play-bar></yin-play-bar>
-  <yin-scroll-top></yin-scroll-top>
-  <yin-footer></yin-footer>
-  <yin-audio></yin-audio>
+  <el-container>
+    <el-header>
+      <yin-header></yin-header>
+    </el-header>
+    <el-main>
+      <router-view />
+      <yin-current-play></yin-current-play>
+      <yin-play-bar></yin-play-bar>
+      <yin-scroll-top></yin-scroll-top>
+      <yin-audio></yin-audio>
+    </el-main>
+    <el-footer>
+      <yin-footer></yin-footer>
+    </el-footer>
+  </el-container>
 </template>
 
 <script lang="ts" setup>
@@ -20,10 +28,9 @@ import YinAudio from "@/components/layouts/YinAudio.vue";
 const { proxy } = getCurrentInstance();
 
 if (sessionStorage.getItem("dataStore")) {
-  proxy.$store.replaceState(Object.assign( {}, proxy.$store.state, JSON.parse(sessionStorage.getItem("dataStore"))));
+  proxy.$store.replaceState(Object.assign({}, proxy.$store.state, JSON.parse(sessionStorage.getItem("dataStore"))));
 }
 
-// 页面刷新时将 vuex 里的信息保存到 sessionStorage
 window.addEventListener("beforeunload", () => {
   sessionStorage.setItem("dataStore", JSON.stringify(proxy.$store.state));
 });
@@ -33,7 +40,14 @@ window.addEventListener("beforeunload", () => {
 @import "@/assets/css/var.scss";
 @import "@/assets/css/global.scss";
 
-#app {
-  @include layout(flex-start, stretch, column);
+.el-container {
+  min-height: calc(100% - 60px);
+}
+.el-header {
+  padding: 0;
+}
+.el-main {
+  padding-left: 0;
+  padding-right: 0;
 }
 </style>

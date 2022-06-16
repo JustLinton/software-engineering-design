@@ -1,14 +1,12 @@
 <template>
   <div class="personal">
     <div class="personal-info">
-      <div class="personal-img">
-        <img :src="userPic ? attachImageUrl(userPic) : userPic" alt="" @click="dialogTableVisible = true"/>
-      </div>
+      <el-image class="personal-img" fit="contain" :src="attachImageUrl(userPic)" @click="dialogTableVisible = true" />
       <div class="personal-msg">
         <div class="username">{{ personalInfo.username }}</div>
         <div class="introduction">{{ personalInfo.introduction }}</div>
       </div>
-      <el-button class="edit-info" round :icon="edit" @click="goPage()">修改个人信息</el-button>
+      <el-button class="edit-info" round :icon="Edit" @click="goPage()">修改个人信息</el-button>
     </div>
     <div class="personal-body">
       <song-list :songList="collectSongList">
@@ -22,22 +20,14 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  nextTick,
-  ref,
-  markRaw,
-  computed,
-  watch,
-  reactive,
-} from "vue";
+import { defineComponent, nextTick, ref, computed, watch, reactive } from "vue";
 import { useStore } from "vuex";
 import { Edit } from "@element-plus/icons-vue";
 import SongList from "@/components/SongList.vue";
-import Upload from "./Upload.vue";
+import Upload from "../setting/Upload.vue";
 import mixin from "@/mixins/mixin";
 import { HttpManager } from "@/api";
-import { PERSONAL_DATA } from "@/enums";
+import { RouterName } from "@/enums";
 
 export default defineComponent({
   components: {
@@ -47,15 +37,14 @@ export default defineComponent({
   setup() {
     const store = useStore();
 
-    const { routerManager, attachImageUrl } = mixin();
+    const { routerManager } = mixin();
 
-    const edit = markRaw(Edit);
     const dialogTableVisible = ref(false);
     const collectSongList = ref([]); // 收藏的歌曲
     const personalInfo = reactive({
       username: "",
-      userSex: "",
-      birth: "",
+      userSex: 0,
+      birth: 0,
       location: "",
       introduction: "",
     });
@@ -66,39 +55,26 @@ export default defineComponent({
     });
 
     function goPage() {
-      routerManager(PERSONAL_DATA, { path: PERSONAL_DATA });
+      routerManager(RouterName.Setting, { path: RouterName.Setting });
     }
-    function getUserInfo(id) {
-      HttpManager.getUserOfId(id)
-        .then((res) => {
-          personalInfo.username = res[0].username;
-          personalInfo.userSex = res[0].sex;
-          personalInfo.birth = res[0].birth;
-          personalInfo.introduction = res[0].introduction;
-          personalInfo.location = res[0].location;
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    }
-    // 收藏的歌曲ID
-    async function getCollection(userId) {
-      const result = (await HttpManager.getCollectionOfUser(userId)) as any[];
-      const collectIDList = result || []; // 存放收藏的歌曲ID
-      // 通过歌曲ID获取歌曲信息
-      for (const item of collectIDList) {
-        getCollectSongList(item.songId);
-      }
+    async function getUserInfo(id) {
+      const result = (await HttpManager.getUserOfId(id)) as ResponsePersonal;
+      console.log('result = ', result);
+      personalInfo.username = result.data[0].username;
+      personalInfo.userSex = result.data[0].sex;
+      personalInfo.birth = result.data[0].birth;
+      personalInfo.introduction = result.data[0].introduction;
+      personalInfo.location = result.data[0].location;
     }
     // 获取收藏的歌曲
-    function getCollectSongList(id) {
-      HttpManager.getSongOfId(id)
-        .then((res) => {
-          collectSongList.value.push(res[0]);
-        })
-        .catch((err) => {
-          console.error(err);
-        });
+    async function getCollection(userId) {
+      const result = (await HttpManager.getCollectionOfUser(userId)) as ResponseBody;
+      const collectIDList = result.data || []; // 存放收藏的歌曲ID
+      // 通过歌曲ID获取歌曲信息
+      for (const item of collectIDList) {
+        const result = (await HttpManager.getSongOfId(item.songId)) as ResponseBody;
+        collectSongList.value.push(result.data[0]);
+      }
     }
 
     nextTick(() => {
@@ -107,12 +83,12 @@ export default defineComponent({
     });
 
     return {
-      edit,
+      Edit,
       userPic,
       dialogTableVisible,
       collectSongList,
       personalInfo,
-      attachImageUrl,
+      attachImageUrl: HttpManager.attachImageUrl,
       goPage,
     };
   },
@@ -120,5 +96,66 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/css/personal.scss";
+@import "@/assets/css/var.scss";
+
+.personal {
+  padding-top: $header-height + 150px;
+
+  &::before {
+    content: "";
+    /* background-color: $color-blue-shallow; */
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: $header-height + 150px;
+  }
+}
+
+.personal-info {
+  position: relative;
+  margin-bottom: 100px;
+  .personal-img {
+    height: 200px;
+    width: 200px;
+    border-radius: 50%;
+    border: 5px solid $color-white;
+    position: absolute;
+    top: -180px;
+    left: 50px;
+    cursor: pointer;
+  }
+  .personal-msg {
+    margin-left: 300px;
+    position: absolute;
+    top: -120px;
+
+    .username {
+      font-size: 3rem;
+      font-weight: 400;
+      color: $color-blue;
+    }
+
+    .introduction {
+      font-size: 20px;
+      font-weight: 500;
+    }
+  }
+  .edit-info {
+    position: absolute;
+    right: 10vw;
+    margin-top: -120px;
+  }
+}
+
+@media screen and (min-width: $sm) {
+  .personal-body {
+    padding: 0px 100px;
+  }
+}
+
+@media screen and (max-width: $sm) {
+  .edit-info {
+    display: none;
+  }
+}
 </style>

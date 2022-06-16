@@ -5,14 +5,7 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  ref,
-  computed,
-  watch,
-  onMounted,
-  getCurrentInstance,
-} from "vue";
+import { defineComponent, ref, computed, watch, onMounted, getCurrentInstance } from "vue";
 import { useStore } from "vuex";
 import SongList from "@/components/SongList.vue";
 import { HttpManager } from "@/api";
@@ -37,15 +30,15 @@ export default defineComponent({
         currentSongList.value = [];
         return;
       }
-      const result = (await HttpManager.getSongOfSingerName(value)) as any[];
-      if (!result.length) {
+      const result = (await HttpManager.getSongOfSingerName(value)) as ResponseBody;
+      if (!result.data.length) {
         currentSongList.value = [];
-        (proxy as any).$notify({
-          title: "暂时没有相关歌曲",
+        (proxy as any).$message({
+          message: "暂时没有相关歌曲",
           type: "warning",
         });
       } else {
-        currentSongList.value = result;
+        currentSongList.value = result.data;
       }
     }
 
@@ -59,9 +52,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style scoped>
-.search-song {
-  min-height: 480px;
-}
-</style>

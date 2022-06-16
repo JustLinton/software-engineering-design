@@ -17,7 +17,7 @@
 
   .progress {
     position: absolute;
-    margin-top: -10px
+    margin-top: -10px;
   }
 
   .control-box {
@@ -32,7 +32,7 @@
       position: relative;
       margin: auto;
       flex-wrap: nowrap;
-      
+
       svg {
         width: 5rem;
         cursor: pointer;
@@ -43,18 +43,12 @@
     }
 
     .info-box {
-      width: 30%;
-      margin-left: 30px;
       .song-bar-img {
         width: calc($play-bar-height - 15px);
         height: calc($play-bar-height - 15px);
         border-radius: 4px;
-        overflow: hidden;
         margin-right: 10px;
-        img {
-          cursor: pointer;
-          height: 100%;
-        }
+        cursor: pointer;
       }
       .song-info {
         font-size: 14px;
@@ -81,10 +75,15 @@
 }
 
 .icon {
-  @include icon(1.2em, $color-black);
+  @include icon(1.2em, $color-blue);
 }
 
 @media screen and (min-width: $sm) {
+  .info-box {
+    width: 30%;
+    min-width: 200px;
+    margin-left: 30px;
+  }
   .song-ctr,
   .info-box,
   .song-edit {
@@ -94,8 +93,14 @@
 }
 
 @media screen and (max-width: $sm) {
-  .info-box,
-  .song-edit {
+  .info-box {
+    display: flex;
+    flex-direction: row;
+    width: 70%;
+    margin-left: 10px;
+  }
+
+  .yin-play-show {
     display: none;
   }
 }

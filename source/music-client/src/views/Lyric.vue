@@ -1,8 +1,6 @@
 <template>
   <div class="song-container">
-    <div class="song-pic">
-      <img :src="songPic" />
-    </div>
+    <el-image class="song-pic" fit="contain" :src="attachImageUrl(songPic)" />
     <ul class="song-info">
       <li>歌手：{{ singerName }}</li>
       <li>歌曲：{{ songTitle }}</li>
@@ -13,12 +11,7 @@
       <div class="song-lyric">
         <transition-group name="lyric-fade">
           <!--有歌词-->
-          <ul
-            :style="{ top: lrcTop }"
-            class="has-lyric"
-            v-if="lyricArr.length"
-            key="has-lyric"
-          >
+          <ul :style="{ top: lrcTop }" class="has-lyric" v-if="lyricArr.length" key="has-lyric">
             <li v-for="(item, index) in lyricArr" :key="index">
               {{ item[1] }}
             </li>
@@ -35,10 +28,11 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref, watch } from 'vue';
-import { useStore} from "vuex";
+import { computed, defineComponent, ref, watch } from "vue";
+import { useStore } from "vuex";
 import Comment from "@/components/Comment.vue";
 import { parseLyric } from "@/utils";
+import { HttpManager } from "@/api";
 
 export default defineComponent({
   components: {
@@ -59,7 +53,7 @@ export default defineComponent({
     const songPic = computed(() => store.getters.songPic); // 歌曲图片
     watch(songId, () => {
       lyricArr.value = parseLyric(currentPlayList.value[currentPlayIndex.value].lyric);
-    })
+    });
     // 处理歌词位置及颜色
     watch(curTime, () => {
       if (lyricArr.value.length !== 0) {
@@ -77,7 +71,7 @@ export default defineComponent({
           }
         }
       }
-    })
+    });
 
     lyricArr.value = lyric.value ? parseLyric(lyric.value) : [];
 
@@ -88,7 +82,8 @@ export default defineComponent({
       lrcTop,
       lyricArr,
       songId,
-    }
+      attachImageUrl: HttpManager.attachImageUrl,
+    };
   },
 });
 </script>
@@ -96,47 +91,40 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import "@/assets/css/var.scss";
 
-.container {
-  padding-top: $header-height + 30px;
-}
-
 .song-container {
   position: fixed;
   top: 120px;
   left: 50px;
+  display: flex;
+  flex-direction: column;
+
   .song-pic {
     height: 300px;
     width: 300px;
-    overflow: hidden;
     border: 4px solid white;
     border-radius: 12px;
-    img {
-      height: 100%;
-    }
   }
+
   .song-info {
     width: 300px;
     li {
       width: 100%;
       line-height: 40px;
       font-size: 18px;
-      text-align: center;
+      padding-left: 10%;
     }
   }
 }
 
 .lyric-container {
-  margin: 0 150px 0px 400px;
-  border-radius: 12px;
-  padding: 80px 20px 30px 20px;
   font-family: $font-family;
-  background-color: $color-white;
   .song-lyric {
     position: relative;
     min-height: 300px;
     padding: 30px 0;
     overflow: auto;
-    // text-align: center;
+    border-radius: 12px;
+    background-color: $color-light-grey;
     .has-lyric {
       position: absolute;
       transition: all 1s;
@@ -169,5 +157,23 @@ export default defineComponent({
 .lyric-fade-enter-active,
 .lyric-fade-leave-active {
   transition: all 0.3s ease;
+}
+
+@media screen and (min-width: $sm) {
+  .container {
+    padding-top: 30px;
+  }
+  .lyric-container {
+    margin: 0 150px 0px 400px;
+  }
+}
+
+@media screen and (max-width: $sm) {
+  .container {
+    padding: 20px;
+  }
+  .song-container {
+    display: none;
+  }
 }
 </style>
